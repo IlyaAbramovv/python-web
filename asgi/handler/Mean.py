@@ -6,6 +6,8 @@ from asgi.handler.base import BaseHandler
 class Mean(BaseHandler):
     async def handle(self):
         elements = await self.get_body_as_float_array()
+        if elements is None:
+            return await self.send_422()
         mean = sum(elements) / len(elements)
         return await self.send_result(mean)
 
@@ -20,7 +22,7 @@ class Mean(BaseHandler):
         elements = re.split(r',\s*',  body_decoded[1:-1])
         try:
             return [float(i) for i in elements]
-        except ValueError as _:
-            return await self.send_422()
+        except ValueError:
+            return None
 
 
